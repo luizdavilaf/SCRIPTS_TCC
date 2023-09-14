@@ -1,5 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
-const sequelize = require('./sequelize-config');
+const sequelize = require("../db/sequelize-connection");
 
 class Cargo extends Model { }
 
@@ -13,7 +13,8 @@ Cargo.init({
 }, {
     sequelize,    
     modelName: 'Cargo',    
-    comment: 'Tabela que armazena informações sobre os cargos dos candidatos.',
+    comment: 'Tabela que armazena informações sobre os cargos dos candidatos, criada para categorizar as profissoes',    
+    tableName: "cargo"
 });
 
 module.exports = Cargo;

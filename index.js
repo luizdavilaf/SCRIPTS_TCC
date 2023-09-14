@@ -1,33 +1,194 @@
 const fs = require('fs');
 const csvParser = require('csv-parser');
-const sequelize = require('./sequelize-config');
+//const sequelize = require('./sequelize-config');
 const Candidato = require('./models/Candidato');
+const Partido = require('./models/Partido');
+const Cargo = require('./models/Cargo');
+const Eleicao = require('./models/Eleicao');
+const Ocupacao = require('./models/Ocupacao');
+const CandidatoEleicao = require('./models/CandidatoEleicao');
+const sequelize = require("./db/sequelize-connection");
+const db = require('./db/dbconnection');
+const { Sequelize } = require("sequelize");
+const sync = require('./models/sync')
+
 
 // Caminho para o arquivo CSV
-const csvFilePath = 'seu_arquivo.csv';
+const csvFilePath = 'E:\\ifrs\\TCC\\SCRIPTS_TCC\\csvs\\consulta_cand_2002_BRASIL.csv';
+const linhas = []
 
-// Sincronize o modelo com o banco de dados
-(async () => {
-    try {
-        await sequelize.sync({ force: true }); // Use { force: true } apenas para criar a tabela (cuidado, isso apagará dados existentes)
-
-        fs.createReadStream(csvFilePath)
+const readCsv = () => {
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(csvFilePath, 'latin1')
             .pipe(csvParser({ separator: ';' }))
             .on('data', async (row) => {
-                // Insira os dados do CSV no modelo
-                await Candidato.create({
+                //  console.log(row.DS_GENERO)
+                /* console.log(row.SQ_CANDIDATO)
+                console.log(row.NM_CANDIDATO) */
+                const linha = {
+                    NM_MUNICIPIO_NASCIMENTO: row.NM_MUNICIPIO_NASCIMENTO,
+                    SG_UF_NASCIMENTO: row.SG_UF_NASCIMENTO,
                     NM_CANDIDATO: row.NM_CANDIDATO,
-                    NR_CANDIDATO: parseInt(row.NR_CANDIDATO, 10),
-                    // Mapeie os outros campos do modelo aqui...
-                });
+                    DS_GENERO: row.DS_GENERO,
+                    SQ_CANDIDATO: row.SQ_CANDIDATO,
+                    NR_CPF_CANDIDATO: row.NR_CPF_CANDIDATO,
+                    NR_TITULO_ELEITORAL_CANDIDATO: row.NR_TITULO_ELEITORAL_CANDIDATO,
+                    SG_PARTIDO: row.SG_PARTIDO,
+                    NM_PARTIDO: row.NM_PARTIDO,
+                    DS_CARGO: row.DS_CARGO,
+                    ANO_ELEICAO: row.ANO_ELEICAO,
+                    NR_TURNO: row.NR_TURNO,
+                    DS_OCUPACAO: row.DS_OCUPACAO,
+                    SG_UF: row.SG_UF,
+                    SG_UE: row.SG_UE,
+                    DS_SITUACAO_CANDIDATURA: row.DS_SITUACAO_CANDIDATURA,
+                    ST_REELEICAO: row.ST_REELEICAO,
+                    NR_IDADE_DATA_POSSE: row.NR_IDADE_DATA_POSSE,
+                    DS_COMPOSICAO_COLIGACAO: row.DS_COMPOSICAO_COLIGACAO,
+                    DS_GRAU_INSTRUCAO: row.DS_GRAU_INSTRUCAO,
+                    DS_SIT_TOT_TURNO: row.DS_SIT_TOT_TURNO,
+                    NM_URNA_CANDIDATO: row.NM_URNA_CANDIDATO,
+                    DS_COR_RACA: row.DS_COR_RACA,
+                }
+                linhas.push(linha)
             })
             .on('end', () => {
-                console.log('Dados do CSV inseridos com sucesso.');
+                resolve(linhas)
             });
+    })
+}
+
+(async () => {
+    try {
+        readCsv().then(async (rows) => {
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                // Insira os dados do CSV no modelo
+                let existingCandidato = null;
+
+                console.log(rows.length - i)
+                if (row.NR_CPF_CANDIDATO !== '-1') {
+                    existingCandidato = await Candidato.findOne({
+                        where: {
+                            NR_CPF_CANDIDATO: row.NR_CPF_CANDIDATO,
+                        },
+                    });
+                } else if (row.NR_TITULO_ELEITORAL_CANDIDATO !== '-1') {
+                    existingCandidato = await Candidato.findOne({
+                        where: {
+                            NR_TITULO_ELEITORAL_CANDIDATO: row.NR_TITULO_ELEITORAL_CANDIDATO,
+                        },
+                    });
+                } else if (row.SQ_CANDIDATO !== '-1') {
+                    existingCandidato = await Candidato.findOne({
+                        where: {
+                            SQ_CANDIDATO: row.SQ_CANDIDATO,
+                        },
+                    });
+                }
+
+                if (!existingCandidato) {
+                    existingCandidato = await Candidato.create({
+                        NM_CANDIDATO: row.NM_CANDIDATO,
+                        DS_GENERO: row.DS_GENERO,
+                        SQ_CANDIDATO: row.SQ_CANDIDATO,
+                        NR_CPF_CANDIDATO: row.NR_CPF_CANDIDATO,
+                        NR_TITULO_ELEITORAL_CANDIDATO: row.NR_TITULO_ELEITORAL_CANDIDATO,
+                        NM_MUNICIPIO_NASCIMENTO: row.NM_MUNICIPIO_NASCIMENTO,
+                        SG_UF_NASCIMENTO: row.SG_UF_NASCIMENTO,
+                        DS_COR_RACA: row.DS_COR_RACA,
+                    });
+                } else if (existingCandidato && row.DS_COR_RACA && !existingCandidato.DS_COR_RACA){
+                    existingCandidato.setDataValue('DS_COR_RACA', row.DS_COR_RACA)
+                    await existingCandidato.save()
+                }
+
+                let existingPartido = await Partido.findOne({
+                    where: {
+                        SG_PARTIDO: row.SG_PARTIDO,
+                    },
+                });
+
+                if (!existingPartido) {
+                    existingPartido = await Partido.create({
+                        SG_PARTIDO: row.SG_PARTIDO,
+                        NM_PARTIDO: row.NM_PARTIDO,
+                    });
+                }
+
+                let existingCargo = await Cargo.findOne({
+                    where: {
+                        DS_CARGO: row.DS_CARGO,
+                    },
+                });
+
+                if (!existingCargo) {
+                    existingCargo = await Cargo.create({
+                        DS_CARGO: row.DS_CARGO,
+                    });
+                }
+
+                let existingEleicao = await Eleicao.findOne({
+                    where: {
+                        ANO_ELEICAO: row.ANO_ELEICAO,
+                        NR_TURNO: row.NR_TURNO,
+                    },
+                });
+
+                if (!existingEleicao) {
+                    existingEleicao = await Eleicao.create({
+                        ANO_ELEICAO: row.ANO_ELEICAO,
+                        NR_TURNO: row.NR_TURNO,
+                    });
+                }
+
+                let existingOcupacao = await Ocupacao.findOne({
+                    where: {
+                        DS_OCUPACAO: row.DS_OCUPACAO,
+                    },
+                });
+
+                if (!existingOcupacao) {
+                    existingOcupacao = await Ocupacao.create({
+                        DS_OCUPACAO: row.DS_OCUPACAO,
+                    });
+                }
+
+                let candidatoEleicao = await CandidatoEleicao.create({
+                    SG_UF: row.SG_UF,
+                    SG_UE: row.SG_UE,
+                    DS_SITUACAO_CANDIDATURA: row.DS_SITUACAO_CANDIDATURA,
+                    ST_REELEICAO: row.ST_REELEICAO,
+                    NR_IDADE_DATA_POSSE: row.NR_IDADE_DATA_POSSE,
+                    DS_COMPOSICAO_COLIGACAO: row.DS_COMPOSICAO_COLIGACAO,
+                    DS_GRAU_INSTRUCAO: row.DS_GRAU_INSTRUCAO,
+                    DS_SIT_TOT_TURNO: row.DS_SIT_TOT_TURNO,
+                    NM_URNA_CANDIDATO: row.NM_URNA_CANDIDATO,
+                });
+                
+                await existingOcupacao.addCandidatoEleicao(candidatoEleicao)
+                await existingCandidato.addCandidatoEleicao(candidatoEleicao);
+                await existingEleicao.addCandidatoEleicao(candidatoEleicao);
+                await existingPartido.addCandidatoEleicao(candidatoEleicao);
+                await existingCargo.addCandidatoEleicao(candidatoEleicao);
+
+                //console.log("salvo!")
+
+            }
+        })
+
+
+
+
+
+
+
+
+
     } catch (error) {
         console.error('Erro:', error);
     } finally {
         // Feche a conexão com o banco de dados
-        await sequelize.close();
+        //await sequelize.close();
     }
 })();

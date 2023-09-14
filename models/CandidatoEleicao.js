@@ -1,5 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
-const sequelize = require('./sequelize-config');
+const sequelize = require("../db/sequelize-connection");
 const Candidato = require('./Candidato');
 const Eleicao = require('./Eleicao');
 const Ocupacao = require('./Ocupacao');
@@ -59,13 +59,11 @@ CandidatoEleicao.init({
 }, {
     sequelize,
     modelName: 'CandidatoEleicao',
+    comment: "tabela utilizada para relacionar as características do candidato em cada eleicao",
+    tableName: "candidatoEleicao"
 });
 
 // Defina as associações
-CandidatoEleicao.belongsTo(Candidato);
-CandidatoEleicao.belongsTo(Eleicao);
-CandidatoEleicao.belongsTo(Ocupacao);
-CandidatoEleicao.belongsTo(Cargo);
-CandidatoEleicao.belongsTo(Partido);
+
 
 module.exports = CandidatoEleicao;
