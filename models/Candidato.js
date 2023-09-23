@@ -8,11 +8,7 @@ Candidato.init({
     NM_CANDIDATO: {
         type: DataTypes.STRING,
         comment: 'Nome do candidato',
-    },
-    DS_GENERO: {
-        type: DataTypes.STRING,
-        comment: 'genero do candidato',
-    },
+    },    
     SQ_CANDIDATO: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -37,12 +33,7 @@ Candidato.init({
         type: DataTypes.STRING,
         allowNull: false,
         comment: "estado de nascimento do candidato"
-    },
-    DS_COR_RACA: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        comment: "raça do candidato"
-    }      
+    },       
     // Outros campos relevantes
 }, {
     sequelize,

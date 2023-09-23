@@ -7,6 +7,12 @@ const Cargo = require('./models/Cargo');
 const Eleicao = require('./models/Eleicao');
 const Ocupacao = require('./models/Ocupacao');
 const CandidatoEleicao = require('./models/CandidatoEleicao');
+const UnidadeEleitoral = require('./models/UnidadeEleitoral');
+const GrauDeInstrucao = require('./models/GrauDeInstrucao');
+const SituacaoCandidatura = require('./models/SituacaoCandidatura');
+const SituacaoTurno = require('./models/SituacaoTurno');
+const Raca = require('./models/Raca');
+const Genero = require('./models/Genero');
 const sequelize = require("./db/sequelize-connection");
 const db = require('./db/dbconnection');
 const { Sequelize } = require("sequelize");
@@ -14,7 +20,7 @@ const sync = require('./models/sync')
 
 
 // Caminho para o arquivo CSV
-const csvFilePath = 'E:\\ifrs\\TCC\\SCRIPTS_TCC\\csvs\\consulta_cand_2002_BRASIL.csv';
+const csvFilePath = 'E:\\repos\\SCRIPTS_TCC\\csvs\\consulta_cand_2002_BRASIL.csv';
 const linhas = []
 
 const readCsv = () => {
@@ -41,6 +47,7 @@ const readCsv = () => {
                     DS_OCUPACAO: row.DS_OCUPACAO,
                     SG_UF: row.SG_UF,
                     SG_UE: row.SG_UE,
+                    TP_ABRANGENCIA: row.TP_ABRANGENCIA,
                     DS_SITUACAO_CANDIDATURA: row.DS_SITUACAO_CANDIDATURA,
                     ST_REELEICAO: row.ST_REELEICAO,
                     NR_IDADE_DATA_POSSE: row.NR_IDADE_DATA_POSSE,
@@ -87,21 +94,46 @@ const readCsv = () => {
                     });
                 }
 
+                let existingGenero = await Genero.findOne({
+                    where: {
+                        DS_GENERO: row.DS_GENERO,
+                    },
+                });
+
+                if (!existingGenero) {
+                    existingGenero = await Genero.create({
+                        DS_GENERO: row.DS_GENERO,
+                    });
+                }
+
+                let existingRaca
+                if (row.DS_COR_RACA) {
+                    existingRaca = await Raca.findOne({
+                        where: {
+                            DS_COR_RACA: row.DS_COR_RACA,
+                        },
+                    });
+                    if (!existingRaca) {
+                        existingRaca = await Raca.create({
+                            DS_COR_RACA: row.DS_COR_RACA,
+                        });
+                    }
+                }
+
                 if (!existingCandidato) {
                     existingCandidato = await Candidato.create({
                         NM_CANDIDATO: row.NM_CANDIDATO,
-                        DS_GENERO: row.DS_GENERO,
                         SQ_CANDIDATO: row.SQ_CANDIDATO,
                         NR_CPF_CANDIDATO: row.NR_CPF_CANDIDATO,
                         NR_TITULO_ELEITORAL_CANDIDATO: row.NR_TITULO_ELEITORAL_CANDIDATO,
                         NM_MUNICIPIO_NASCIMENTO: row.NM_MUNICIPIO_NASCIMENTO,
                         SG_UF_NASCIMENTO: row.SG_UF_NASCIMENTO,
-                        DS_COR_RACA: row.DS_COR_RACA,
                     });
-                } else if (existingCandidato && row.DS_COR_RACA && !existingCandidato.DS_COR_RACA){
-                    existingCandidato.setDataValue('DS_COR_RACA', row.DS_COR_RACA)
-                    await existingCandidato.save()
                 }
+                if (existingRaca && existingCandidato && !existingCandidato.Raca) {
+                    await existingRaca.addCandidato(existingCandidato)
+                }
+                await existingGenero.addCandidato(existingCandidato)
 
                 let existingPartido = await Partido.findOne({
                     where: {
@@ -154,18 +186,66 @@ const readCsv = () => {
                     });
                 }
 
+                let existingUnidadeEleitoral = await UnidadeEleitoral.findOne({
+                    where: {
+                        SG_UE: row.SG_UE,
+                    },
+                });
+
+                if (!existingUnidadeEleitoral) {
+                    existingUnidadeEleitoral = await UnidadeEleitoral.create({
+                        SG_UE: row.SG_UE,
+                        TP_ABRANGENCIA: row.TP_ABRANGENCIA,
+                    });
+                }
+
+                let existingGrauDeInstrucao = await GrauDeInstrucao.findOne({
+                    where: {
+                        DS_GRAU_INSTRUCAO: row.DS_GRAU_INSTRUCAO,
+                    },
+                });
+
+                if (!existingGrauDeInstrucao) {
+                    existingGrauDeInstrucao = await GrauDeInstrucao.create({
+                        DS_GRAU_INSTRUCAO: row.DS_GRAU_INSTRUCAO,
+                    });
+                }
+
+                let existingSituacaoTurno = await SituacaoTurno.findOne({
+                    where: {
+                        DS_SIT_TOT_TURNO: row.DS_SIT_TOT_TURNO,
+                    },
+                });
+
+                if (!existingSituacaoTurno) {
+                    existingSituacaoTurno = await SituacaoTurno.create({
+                        DS_SIT_TOT_TURNO: row.DS_SIT_TOT_TURNO,
+                    });
+                }
+
+                let existingSituacaoCandidatura = await SituacaoCandidatura.findOne({
+                    where: {
+                        DS_SITUACAO_CANDIDATURA: row.DS_SITUACAO_CANDIDATURA,
+                    },
+                });
+
+                if (!existingSituacaoCandidatura) {
+                    existingSituacaoCandidatura = await SituacaoCandidatura.create({
+                        DS_SITUACAO_CANDIDATURA: row.DS_SITUACAO_CANDIDATURA,
+                    });
+                }
+
                 let candidatoEleicao = await CandidatoEleicao.create({
-                    SG_UF: row.SG_UF,
-                    SG_UE: row.SG_UE,
-                    DS_SITUACAO_CANDIDATURA: row.DS_SITUACAO_CANDIDATURA,
-                    ST_REELEICAO: row.ST_REELEICAO,
+                    ST_REELEICAO: row.ST_REELEICAO.toLowerCase().includes('s') ? true : false,
                     NR_IDADE_DATA_POSSE: row.NR_IDADE_DATA_POSSE,
                     DS_COMPOSICAO_COLIGACAO: row.DS_COMPOSICAO_COLIGACAO,
-                    DS_GRAU_INSTRUCAO: row.DS_GRAU_INSTRUCAO,
-                    DS_SIT_TOT_TURNO: row.DS_SIT_TOT_TURNO,
                     NM_URNA_CANDIDATO: row.NM_URNA_CANDIDATO,
                 });
-                
+
+                await existingSituacaoTurno.addCandidatoEleicao(candidatoEleicao)
+                await existingSituacaoCandidatura.addCandidatoEleicao(candidatoEleicao)
+                await existingGrauDeInstrucao.addCandidatoEleicao(candidatoEleicao)
+                await existingUnidadeEleitoral.addCandidatoEleicao(candidatoEleicao)
                 await existingOcupacao.addCandidatoEleicao(candidatoEleicao)
                 await existingCandidato.addCandidatoEleicao(candidatoEleicao);
                 await existingEleicao.addCandidatoEleicao(candidatoEleicao);
