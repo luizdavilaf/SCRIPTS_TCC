@@ -25,7 +25,6 @@ Partido.init({
     // Outros campos relevantes
 }, {
     sequelize,
-    modelName: 'Partido',
     tableName: "partido"
 });
 

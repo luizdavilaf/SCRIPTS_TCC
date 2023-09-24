@@ -20,12 +20,15 @@ CandidatoEleicao.init({
     NM_URNA_CANDIDATO: {
         type: DataTypes.STRING,
         comment: "Nome da candidata ou candidato que aparece na urna."
+    },
+    VR_DESPESA_MAX_CAMPANHA: {
+        type: DataTypes.DOUBLE,
+        comment: "Valor máximo, em reais, de despesas de campanha declarada pelo partido para aquele candidato."
     }
 
 
 }, {
     sequelize,
-    modelName: 'CandidatoEleicao',
     comment: "tabela utilizada para relacionar as características do candidato em cada eleicao",
     tableName: "candidatoEleicao"
 });

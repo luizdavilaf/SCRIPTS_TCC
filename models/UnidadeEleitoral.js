@@ -21,9 +21,8 @@ UnidadeEleitoral.init({
 
 }, {
     sequelize,
-    modelName: 'UnidadeEleitoral',
     comment: "tabela das unidades eleitorais existentes.",
-    tableName: "UnidadeEleitoral"
+    tableName: "unidadeEleitoral"
 });
 
 // Defina as associações

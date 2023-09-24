@@ -18,7 +18,6 @@ Ocupacao.init({
     // Outros campos relevantes
 }, {
     sequelize,
-    modelName: 'Ocupacao',
     tableName: "ocupacao"
 });
 

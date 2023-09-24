@@ -1,6 +1,14 @@
+const sync = require('./models/sync')
+const db = require('./db/dbconnection');
+const sequelize = require("./db/sequelize-connection");
+
+
 const fs = require('fs');
 const csvParser = require('csv-parser');
-//const sequelize = require('./sequelize-config');
+const { Sequelize } = require("sequelize");
+
+
+
 const Candidato = require('./models/Candidato');
 const Partido = require('./models/Partido');
 const Cargo = require('./models/Cargo');
@@ -13,14 +21,10 @@ const SituacaoCandidatura = require('./models/SituacaoCandidatura');
 const SituacaoTurno = require('./models/SituacaoTurno');
 const Raca = require('./models/Raca');
 const Genero = require('./models/Genero');
-const sequelize = require("./db/sequelize-connection");
-const db = require('./db/dbconnection');
-const { Sequelize } = require("sequelize");
-const sync = require('./models/sync')
 
 
 // Caminho para o arquivo CSV
-const csvFilePath = 'E:\\repos\\SCRIPTS_TCC\\csvs\\consulta_cand_2002_BRASIL.csv';
+const csvFilePath = 'E:\\repos\\SCRIPTS_TCC\\csvs\\consulta_cand_1998_BRASIL.csv';
 const linhas = []
 
 const readCsv = () => {
@@ -56,10 +60,12 @@ const readCsv = () => {
                     DS_SIT_TOT_TURNO: row.DS_SIT_TOT_TURNO,
                     NM_URNA_CANDIDATO: row.NM_URNA_CANDIDATO,
                     DS_COR_RACA: row.DS_COR_RACA,
+                    VR_DESPESA_MAX_CAMPANHA: row.VR_DESPESA_MAX_CAMPANHA,
                 }
                 linhas.push(linha)
             })
             .on('end', () => {
+                console.log("CSV Processado!")
                 resolve(linhas)
             });
     })
@@ -72,14 +78,14 @@ const readCsv = () => {
                 const row = rows[i];
                 // Insira os dados do CSV no modelo
                 let existingCandidato = null;
-
+                
                 console.log(rows.length - i)
-                if (row.NR_CPF_CANDIDATO !== '-1') {
+                if (row.NR_CPF_CANDIDATO !== '-1') {                    
                     existingCandidato = await Candidato.findOne({
                         where: {
                             NR_CPF_CANDIDATO: row.NR_CPF_CANDIDATO,
                         },
-                    });
+                    });                    
                 } else if (row.NR_TITULO_ELEITORAL_CANDIDATO !== '-1') {
                     existingCandidato = await Candidato.findOne({
                         where: {
@@ -106,8 +112,8 @@ const readCsv = () => {
                     });
                 }
 
-                let existingRaca
-                if (row.DS_COR_RACA) {
+                let existingRaca = null;
+                if (row.DS_COR_RACA && row.DS_COR_RACA !== "#NE") {
                     existingRaca = await Raca.findOne({
                         where: {
                             DS_COR_RACA: row.DS_COR_RACA,
@@ -130,16 +136,16 @@ const readCsv = () => {
                         SG_UF_NASCIMENTO: row.SG_UF_NASCIMENTO,
                     });
                 }
-                if (existingRaca && existingCandidato && !existingCandidato.Raca) {
-                    await existingRaca.addCandidato(existingCandidato)
+                if (existingRaca && existingCandidato && (!existingCandidato.Raca || existingCandidato.Raca == "#NE")) {
+                    await existingCandidato.setRaca(existingRaca)                    
                 }
-                await existingGenero.addCandidato(existingCandidato)
+                await existingCandidato.setGenero(existingGenero) 
 
                 let existingPartido = await Partido.findOne({
                     where: {
                         SG_PARTIDO: row.SG_PARTIDO,
                     },
-                });
+                });                
 
                 if (!existingPartido) {
                     existingPartido = await Partido.create({
@@ -240,6 +246,7 @@ const readCsv = () => {
                     NR_IDADE_DATA_POSSE: row.NR_IDADE_DATA_POSSE,
                     DS_COMPOSICAO_COLIGACAO: row.DS_COMPOSICAO_COLIGACAO,
                     NM_URNA_CANDIDATO: row.NM_URNA_CANDIDATO,
+                    VR_DESPESA_MAX_CAMPANHA: row.VR_DESPESA_MAX_CAMPANHA,
                 });
 
                 await existingSituacaoTurno.addCandidatoEleicao(candidatoEleicao)

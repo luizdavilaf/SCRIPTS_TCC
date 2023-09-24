@@ -16,7 +16,6 @@ Eleicao.init({
     }
 }, {
     sequelize,
-    modelName: 'Eleicao',
     primaryKey: ['ANO_ELEICAO', 'NR_TURNO'],     
     tableName: "eleicao"
 });

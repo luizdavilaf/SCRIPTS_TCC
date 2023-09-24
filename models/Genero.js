@@ -13,7 +13,6 @@ Genero.init({
     },
 }, {
     sequelize,
-    modelName: 'Genero',
     comment: "tabela generos existentes.",
     tableName: "genero"
 });

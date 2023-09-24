@@ -14,7 +14,6 @@ GrauDeInstrucao.init({
     ,   
 }, {
     sequelize,
-    modelName: 'GrauDeInstrucao',
     comment: "tabela graus de instrucao existentes.",
     tableName: "grauDeInstrucao"
 });

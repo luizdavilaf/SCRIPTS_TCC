@@ -36,9 +36,8 @@ Candidato.init({
     },       
     // Outros campos relevantes
 }, {
-    sequelize,
-    modelName: 'Candidato',
-    tableName: "candidato"
+    sequelize,    
+    tableName: 'candidato',
     
 });
 

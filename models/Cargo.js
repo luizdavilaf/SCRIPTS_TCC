@@ -11,8 +11,7 @@ Cargo.init({
         comment: 'Descrição do cargo',
     },
 }, {
-    sequelize,    
-    modelName: 'Cargo',    
+    sequelize,        
     comment: 'Tabela que armazena informações sobre os cargos dos candidatos, criada para categorizar as profissoes',    
     tableName: "cargo"
 });

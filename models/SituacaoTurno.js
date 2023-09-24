@@ -14,7 +14,6 @@ SituacaoTurno.init({
     ,   
 }, {
     sequelize,
-    modelName: 'situacaoTurno',
     comment: "tabela das situacoes de turno existentes.",
     tableName: "situacaoTurno"
 });

@@ -4,7 +4,7 @@ const sequelize = require("../db/sequelize-connection");
 class Raca extends Model { }
 
 Raca.init({
-    SG_Raca: {
+    DS_COR_RACA: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
@@ -13,7 +13,6 @@ Raca.init({
     // Outros campos relevantes
 }, {
     sequelize,
-    modelName: 'Raca',
     tableName: "raca"
 });
 

@@ -14,7 +14,6 @@ SituacaoCandidatura.init({
     ,   
 }, {
     sequelize,
-    modelName: 'situacaoCandidatura',
     comment: "tabela das situacoes de candidatura existentes.",
     tableName: "situacaoCandidatura"
 });
