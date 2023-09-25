@@ -6,6 +6,7 @@ const sequelize = require("./db/sequelize-connection");
 const fs = require('fs');
 const csvParser = require('csv-parser');
 const { Sequelize } = require("sequelize");
+const moment = require('moment');
 
 
 
@@ -61,6 +62,7 @@ const readCsv = () => {
                     NM_URNA_CANDIDATO: row.NM_URNA_CANDIDATO,
                     DS_COR_RACA: row.DS_COR_RACA,
                     VR_DESPESA_MAX_CAMPANHA: row.VR_DESPESA_MAX_CAMPANHA,
+                    DT_NASCIMENTO: row.DT_NASCIMENTO,
                 }
                 linhas.push(linha)
             })
@@ -134,6 +136,7 @@ const readCsv = () => {
                         NR_TITULO_ELEITORAL_CANDIDATO: row.NR_TITULO_ELEITORAL_CANDIDATO,
                         NM_MUNICIPIO_NASCIMENTO: row.NM_MUNICIPIO_NASCIMENTO,
                         SG_UF_NASCIMENTO: row.SG_UF_NASCIMENTO,
+                        DT_NASCIMENTO: moment(row.DT_NASCIMENTO, 'DD/MM/YYYY').isValid() ? moment(row.DT_NASCIMENTO, 'DD/MM/YYYY').toDate() : null
                     });
                 }
                 if (existingRaca && existingCandidato && (!existingCandidato.Raca || existingCandidato.Raca == "#NE")) {

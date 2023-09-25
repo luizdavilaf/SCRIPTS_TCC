@@ -33,7 +33,12 @@ Candidato.init({
         type: DataTypes.STRING,
         allowNull: false,
         comment: "estado de nascimento do candidato"
-    },       
+    },  
+    DT_NASCIMENTO: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        comment: "DATA DE NASCIMENTO"
+    },     
     // Outros campos relevantes
 }, {
     sequelize,    

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/luizdavilaf/SCRIPTS_TCC#readme",
   "dependencies": {
     "csv-parser": "^3.0.0",
+    "moment": "^2.29.4",
     "nodemon": "^3.0.1",
     "sequelize": "^6.32.1",
     "sqlite3": "^5.1.6"
