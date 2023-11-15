@@ -5,7 +5,8 @@ class GrauDeInstrucao extends Model { }
 
 GrauDeInstrucao.init({
     // Campos específicos da tabela GrauDeInstrucao        
-    DS_GRAU_INSTRUCAO: {
+    nome_instrucao: {
+        field: "DS_GRAU_INSTRUCAO",
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,

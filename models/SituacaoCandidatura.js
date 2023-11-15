@@ -5,7 +5,8 @@ class SituacaoCandidatura extends Model { }
 
 SituacaoCandidatura.init({
     // Campos específicos da tabela SituacaoCandidatura        
-    DS_SITUACAO_CANDIDATURA: {
+    nome: {
+        field: "DS_SITUACAO_CANDIDATURA",
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,

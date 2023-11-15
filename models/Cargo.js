@@ -4,11 +4,12 @@ const sequelize = require("../db/sequelize-connection");
 class Cargo extends Model { }
 
 Cargo.init({
-    DS_CARGO: {
+    nome_cargo: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true, // Se cada cargo deve ser único
         comment: 'Descrição do cargo',
+        field: "DS_CARGO",
     },
 }, {
     sequelize,        

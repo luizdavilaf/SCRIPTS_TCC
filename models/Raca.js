@@ -4,7 +4,8 @@ const sequelize = require("../db/sequelize-connection");
 class Raca extends Model { }
 
 Raca.init({
-    DS_COR_RACA: {
+    nome: {
+        field: "DS_COR_RACA",
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,

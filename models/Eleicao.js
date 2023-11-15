@@ -4,12 +4,14 @@ const sequelize = require("../db/sequelize-connection");
 class Eleicao extends Model { }
 
 Eleicao.init({
-    ANO_ELEICAO: {
+    ano_eleicao: {
+        field: "ANO_ELEICAO",
         type: DataTypes.INTEGER,
         allowNull: false, 
         comment: "ano da eleicao"
     },
-    NR_TURNO: {
+    turno: {
+        field: "NR_TURNO",
         type: DataTypes.INTEGER,
         allowNull: false, 
         comment: "turno da eleicao"

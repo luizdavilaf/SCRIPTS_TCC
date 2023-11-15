@@ -5,7 +5,8 @@ class Genero extends Model { }
 
 Genero.init({
     // Campos específicos da tabela Genero             
-    DS_GENERO: {
+    nome_genero: {
+        field: "DS_GENERO",
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,

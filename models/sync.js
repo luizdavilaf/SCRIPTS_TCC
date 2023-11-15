@@ -31,20 +31,14 @@ Ocupacao.hasMany(CandidatoEleicao);
 CandidatoEleicao.belongsTo(Cargo);
 Cargo.hasMany(CandidatoEleicao);
 
-
-
-
-
-CandidatoEleicao.hasOne(GrauDeInstrucao);
+CandidatoEleicao.belongsTo(GrauDeInstrucao);
 GrauDeInstrucao.hasMany(CandidatoEleicao);
 
 CandidatoEleicao.belongsTo(SituacaoTurno);
 SituacaoTurno.hasMany(CandidatoEleicao);
 
-
 CandidatoEleicao.belongsTo(UnidadeEleitoral);
 UnidadeEleitoral.hasMany(CandidatoEleicao);
-
 
 CandidatoEleicao.belongsTo(SituacaoCandidatura);
 SituacaoCandidatura.hasMany(CandidatoEleicao);

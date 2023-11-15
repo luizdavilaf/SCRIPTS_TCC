@@ -5,7 +5,8 @@ class SituacaoTurno extends Model { }
 
 SituacaoTurno.init({
     // Campos específicos da tabela SituacaoTurno        
-    DS_SIT_TOT_TURNO: {
+    nome: {
+        field: "DS_SIT_TOT_TURNO",
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
